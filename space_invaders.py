@@ -44,13 +44,13 @@ STATE = None  # usado apenas para callbacks do teclado
 def ler_highscores(filename): #em implementação acho eu
     highscores = []
     if os.path.exists(filename): #verifica se existe
-        f = open (filename, 'r') #abre em leitura
-    for line in f:  
-        line=line.strip() #remove espaços em brancos e quebras de linha
-        if ',' in line: 
-            parts = line.split() #separa score e nome
-            if len(parts) == 2:
-                score_str, name = parts
+        with open (filename, 'r') as f: #abre em leitura
+            for line in f:  
+                line=line.strip() #remove espaços em brancos e quebras de linha
+                if ',' in line: 
+                     parts = line.split(',') #separa score e nome
+                if len(parts) == 2:
+                    score_str, name = parts
                 if score_str.isdigit() or (score_str.startswith('-') and score_str[1:].isdigit()):
                     highscores.append((int(score_str), name))   
     f.close()
@@ -76,7 +76,7 @@ def atualizar_highscores(filename, score):
         f = open(filename, 'w')
         for s, n in highscores: # itera sobre os scores e nomes
             f.write(f"{s},{n}\n") #formato score, nome 
-        f.close
+        f.close()
 
 # =========================
 # Guardar / Carregar estado (texto)
@@ -90,11 +90,6 @@ def guardar_estado_txt(filename, state): #verifica isto depois
     enemies = state["enemies"]
     enemy_bullets = state["enemy_bullets"]
     player_bullets = state["player_bullets"]
-    
-    enemies_bullets = state["enemies_bullets"]
-
-    player_x = player.xcor
-    player_y = player.ycor
 
     save_file = FILE_GUARDAR if filename == SAVE_FILE else filename
     if not os.path.exists(save_file):
@@ -163,18 +158,18 @@ def criar_bala(x, y, tipo):
         bala.shape("circle")
         bala.color("white")
         bala.shapesize(stretch_len=0.5, stretch_wid=0.5)
-        bala.setheading(90) #define direção para cima
+        bala.setheading(90) 
     else:
         bala.shape("circle")
         bala.color("red")
         bala.shapesize(stretch_len=0.5, stretch_wid=0.5)
-        bala.setheading(-90) #define direção para baixo
+        bala.setheading(-90) 
     
     bala.showturtle()
     return bala
 
 def spawn_inimigos_em_grelha(state, posicoes_existentes, dirs_existentes=None): #refazer isto melhor
-    #limpa a lista de objetos inimigos e vetores de movimento atuais
+    #limpa os atuais
     state["enemies"] = []
     state["enemy_moves"] =[]
 
@@ -186,7 +181,7 @@ def spawn_inimigos_em_grelha(state, posicoes_existentes, dirs_existentes=None): 
             state["enemy_moves"].append(move)
         return
     
-    for row in range(ENEMY_ROWS): #criar nova grelha
+    for row in range(ENEMY_ROWS): #nova grelha
         for col in range(ENEMY_COLS):
             x = ( col - ENEMY_COLS /2) * ENEMY_SPACING_X
             y = ENEMY_START_Y - row * ENEMY_SPACING_Y
@@ -213,7 +208,7 @@ def restaurar_balas(state, lista_pos, tipo):
 # Handlers de tecla 
 # =========================
 def mover_esquerda_handler():
-    if STATE["player"] is None: return
+    if STATE["player"] is None: return      
 
     p = STATE["player"]
     new_x = p.xcor() - PLAYER_SPEED
@@ -291,7 +286,7 @@ def inimigos_disparam(state):
             STATE["enemy_bullets"].append(bala)
 
 def verificar_colisoes_player_bullets(state):
-    if STATE["player_bullets"] == 0:
+    if not STATE["player_bullets"]: 
         return False
     else:
         for bullet in STATE["player_bullets"]:
@@ -422,3 +417,6 @@ if __name__ == "__main__":
         STATE["frame"] += 1
         screen.update()
         time.sleep(0.016)
+
+def minhafuncaosoma(a,b):
+    return a+b  
