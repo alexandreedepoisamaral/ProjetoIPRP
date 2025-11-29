@@ -418,5 +418,3 @@ if __name__ == "__main__":
         screen.update()
         time.sleep(0.016)
 
-def minhafuncaosoma(a,b):
-    return a+b  
