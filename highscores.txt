@@ -1,0 +1,4 @@
+1100,/usr/local/bin/python3 /Users/joaoamaral/Downloads/Código_para_alunos/testgame.py
+900,ANON
+500,ANON
+300,/usr/local/bin/python3 /Users/joaoamaral/Downloads/Código_para_alunos/testgame.py
