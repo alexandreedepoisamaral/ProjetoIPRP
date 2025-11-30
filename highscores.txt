@@ -1,10 +1,10 @@
-3000,Alex
-2500,test3
-2200,test
-3000, test4
-500, 1
-600, 2
-600, 2
-600, 2
-600, 2
-600, 2
+2300,     \ola5
+1600,         4
+1600,          tive 1600
+1200,   ola7
+1100, finalmente
+1000,        olaola
+900,    ola6
+700,  ola8
+700,      olaolaolaola
+700,           tive 700

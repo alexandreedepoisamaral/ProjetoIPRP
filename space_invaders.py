@@ -59,13 +59,15 @@ def ler_highscores(filename): #em implementação acho eu
 def atualizar_highscores(filename, score):
     if score == 0:
         return
-    highscores = ler_highscores(filename)
     
-    is_new_highscore = False
+    highscores = ler_highscores(filename)
+
+    entra_no_top = False
     if len(highscores) < TOP_N:
         entra_no_top = True
     elif score > highscores [-1][0]:
-        entra_no_top = False
+        entra_no_top = True
+
     if not entra_no_top:
         return 
     
@@ -78,7 +80,7 @@ def atualizar_highscores(filename, score):
     
     with open (filename, 'w') as f:
         for s, n in highscores:
-            f.write(f"{s}, {n}")
+            f.write(f"{s}, {n}\n")
 # =========================
 # Guardar / Carregar estado (texto)
 # =========================
@@ -178,14 +180,14 @@ def spawn_inimigos_em_grelha(state, posicoes_existentes, dirs_existentes=None): 
             state["enemy_moves"].append(move)
         return
     
+    largura_total = (ENEMY_COLS - 1) * ENEMY_SPACING_X
+    x_inicio = -largura_total/2
+
     for col in range(ENEMY_COLS):
         for row in range(ENEMY_ROWS): 
-            x = ( col - ENEMY_COLS/2) * ENEMY_SPACING_X
+            x = x_inicio + col * ENEMY_SPACING_X 
             y = ENEMY_START_Y - row * ENEMY_SPACING_Y
-            if x < -BORDA_X + ENEMY_SIZE: 
-                x = -BORDA_X + ENEMY_SIZE
-            elif x > BORDA_X - ENEMY_SIZE:
-                x = BORDA_X - ENEMY_SIZE
+
             enemy = criar_entidade(x,y,"enemy")
             state["enemies"].append(enemy)
             #adaptar isto no fim
@@ -269,12 +271,6 @@ def atualizar_balas_inimigos(state):
 
 
 def atualizar_inimigos(state):
-    """
-    Atualiza a posição de cada inimigo.
-    - Cai lentamente (ENEMY_FALL_SPEED)
-    - Move horizontalmente de acordo com enemy_moves
-    - Evita sobreposição com outros inimigos
-    """
     for i, enemy in enumerate(state["enemies"][:]):
         # Movimento vertical
         new_y = enemy.ycor() - ENEMY_FALL_SPEED
@@ -450,6 +446,7 @@ if __name__ == "__main__":
             terminar_handler()
 
         if len(STATE["enemies"]) == 0:
+            time.sleep(0.5)
             print("Vitória! Todos os inimigos foram destruídos.")
             terminar_handler()
 
