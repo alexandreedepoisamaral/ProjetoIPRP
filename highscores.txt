@@ -1,10 +1,10 @@
-2300,     \ola5
-1600,         4
-1600,          tive 1600
-1200,   ola7
-1100, finalmente
-1000,        olaola
-900,    ola6
-700,  ola8
-700,      olaolaolaola
-700,           tive 700
+3000,   /usr/local/bin/python3 /Users/joaoamaral/Downloads/Código_para_alunos/space_invaders.py
+3000,       /usr/local/bin/python3 /Users/joaoamaral/Downloads/Código_para_alunos/space_invaders.py
+2700, /usr/local/bin/python3 /Users/joaoamaral/Downloads/Código_para_alunos/space_invaders.py
+2300,            \ola5
+2100,     /usr/local/bin/python3 /Users/joaoamaral/Downloads/Código_para_alunos/space_invaders.py
+1600,    \
+1600,                4
+1600,                 tive 1600
+1200,  /usr/local/bin/python3 /Users/joaoamaral/Downloads/Código_para_alunos/space_invaders.py
+1200,          ola7

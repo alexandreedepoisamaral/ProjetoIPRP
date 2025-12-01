@@ -43,12 +43,12 @@ STATE = None  # usado apenas para callbacks do teclado
 # =========================
 def ler_highscores(filename): #em implementação acho eu
     highscores = []
-    if os.path.exists(filename): #verifica se existe
-        with open (filename, 'r') as f: #abre em leitura
+    if os.path.exists(filename): 
+        with open (filename, 'r') as f:
             for line in f:  
                 line=line.strip() #remove espaços em brancos e quebras de linha
                 if ',' in line: 
-                     parts = line.split(',') #separa score e nome
+                     parts = line.split(',') #separa
                 if len(parts) == 2:
                     score_str, name = parts
                 if score_str.isdigit() or (score_str.startswith('-') and score_str[1:].isdigit()):
@@ -67,7 +67,6 @@ def atualizar_highscores(filename, score):
         entra_no_top = True
     elif score > highscores [-1][0]:
         entra_no_top = True
-
     if not entra_no_top:
         return 
     
@@ -80,7 +79,7 @@ def atualizar_highscores(filename, score):
     
     with open (filename, 'w') as f:
         for s, n in highscores:
-            f.write(f"{s}, {n}\n")
+            f.write(f"{s}, {n}\n")      
 # =========================
 # Guardar / Carregar estado (texto)
 # =========================
@@ -135,6 +134,7 @@ def carregar_estado_txt(filename):
 # Criação de entidades (jogador, inimigo e balas)
 # =========================
 def criar_entidade(x,y, tipo="enemy"):
+
     entidade = turtle.Turtle(visible=False)
     entidade.penup()
     entidade.speed(0)
@@ -147,6 +147,7 @@ def criar_entidade(x,y, tipo="enemy"):
     
     entidade.showturtle()
     return entidade
+
 def criar_bala(x, y, tipo):
     bala = turtle.Turtle(visible=False)
     bala.penup()
@@ -192,15 +193,15 @@ def spawn_inimigos_em_grelha(state, posicoes_existentes, dirs_existentes=None): 
             state["enemies"].append(enemy)
             #adaptar isto no fim
             initial_dir = random.choice([-ENEMY_DRIFT_STEP, ENEMY_DRIFT_STEP]) 
-            state["enemy_moves"].append({"x": initial_dir, 'y': 0.0}) #adiciona vetor de movimento
+            state["enemy_moves"].append({"x": initial_dir, 'y': 0.0}) #adiciona vetor de movimento 'y': 0.0}) #vetor mov
 
 def restaurar_balas(state, lista_pos, tipo):
     lista_balas = state[f"{tipo}_bullets"]
 
     for bala in lista_balas:
-        bala.hideturtle() #esconde balas antigas
+        bala.hideturtle() 
 
-    lista_balas[:] = [] #limpa a lista de referencias ¿?
+    lista_balas[:] = [] #limpa referencias
 
     for x,y in lista_pos:
         bala = criar_bala(x,y,tipo)
@@ -272,43 +273,32 @@ def atualizar_balas_inimigos(state):
 
 def atualizar_inimigos(state):
     for i, enemy in enumerate(state["enemies"][:]):
-        # Movimento vertical
         new_y = enemy.ycor() - ENEMY_FALL_SPEED
         enemy.sety(new_y)
+
         if new_y < -BORDA_Y:
             enemy.hideturtle()
             state["enemies"].remove(enemy)
             state["enemy_moves"].pop(i)
             continue
-
-        # Movimento horizontal baseado no vetor guardado
-        move = state["enemy_moves"][i]
-        proposed_x = enemy.xcor() + move["x"]
-
-        # Verifica se a posição horizontal está dentro das bordas
-        if proposed_x < -BORDA_X + ENEMY_SIZE:
-            proposed_x = -BORDA_X + ENEMY_SIZE
-            move["x"] *= -1  # Inverte direção ao bater na borda
-        elif proposed_x > BORDA_X - ENEMY_SIZE:
-            proposed_x = BORDA_X - ENEMY_SIZE
-            move["x"] *= -1
-
-        # Verifica colisão com outros inimigos
-        overlap = False
-        for j, other in enumerate(state["enemies"]):
-            if other == enemy:
-                continue
-            if abs(proposed_x - other.xcor()) < ENEMY_SPACING_X * 0.8 and abs(new_y - other.ycor()) < ENEMY_SPACING_Y * 0.8:
-                overlap = True
-                break
-
-        # Se não houver sobreposição, aplica movimento
-        if not overlap:
-            enemy.setx(proposed_x)
-        else:
-            # Inverte direção ao tentar sobrepor
-            move["x"] *= -1
-
+        
+        movimento = state["enemy_moves"][i]
+        
+        if random.random() < ENEMY_DRIFT_CHANCE:
+            if random.random() < ENEMY_INVERT_CHANCE:
+                movimento["x"] *= -1  #-1 ou 1
+            
+            new_x = enemy.xcor() + movimento["x"]
+            
+            # Verifica bordas
+            if new_x < -BORDA_X:
+                new_x = -BORDA_X
+                movimento["x"] = 1  
+            elif new_x > BORDA_X:
+                new_x = BORDA_X
+                movimento["x"] = -1 
+            
+            enemy.setx(new_x)
 
 def inimigos_disparam(state):
     for enemy in STATE["enemies"]:
@@ -321,17 +311,18 @@ def inimigos_disparam(state):
 def verificar_colisoes_player_bullets(state):
     if not STATE["player_bullets"]: 
         return False
-    else:
-        for bullet in STATE["player_bullets"][:]:
-            for enemy in STATE["enemies"][:]:
-                if bullet.distance(enemy) < COLLISION_RADIUS:
-                    bullet.hideturtle()
-                    enemy.hideturtle()
-                    STATE["player_bullets"].remove(bullet)
-                    STATE["enemies"].remove(enemy)
-                    STATE["score"] += ENEMY_SCORE
-                    break
-        return True
+    houve_colisao = False
+    for bullet in STATE["player_bullets"][:]:
+        for enemy in STATE["enemies"][:]:
+            if bullet.distance(enemy) < COLLISION_RADIUS:
+                bullet.hideturtle()
+                enemy.hideturtle()
+                STATE["player_bullets"].remove(bullet)
+                STATE["enemies"].remove(enemy)
+                STATE["score"] += ENEMY_SCORE
+                houve_colisao = True
+                break
+    return houve_colisao
     
 def verificar_colisoes_enemy_bullets(state):
     if not STATE["enemy_bullets"]:
@@ -342,9 +333,9 @@ def verificar_colisoes_enemy_bullets(state):
             bullet.hideturtle()
             STATE["enemy_bullets"].remove(bullet)
             player.hideturtle()
-            STATE["player"] = None # jogador destruido
-            return True  # houve colisao
-    return False         # nao houve colisao
+            STATE["player"] = None 
+            return True  
+    return False         
 
 def inimigo_chegou_ao_fundo(state):
     if STATE["player"] is None: return False
@@ -354,9 +345,9 @@ def inimigo_chegou_ao_fundo(state):
             return True
     return False
 
-def verificar_colisao_player_com_inimigos(state): #refaz isto mais simples depois secalhar
+def verificar_colisao_player_com_inimigos(state):
     player = STATE["player"]
-    if player is None: #se ja morreu 
+    if player is None: 
         return False
     max_dist = COLLISION_RADIUS
     for enemy in state["enemies"]:
